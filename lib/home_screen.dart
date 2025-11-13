@@ -74,7 +74,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ColorPallete.red,
-        onPressed: () {},
+        onPressed: () {
+          _showAddTaskModalBottomSheet(context);
+        },
         tooltip: 'Add Task',
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: ColorPallete.white),
@@ -116,5 +118,91 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _showAddTaskModalBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ColorPallete.black,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 8,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                  hintText: 'Task Title',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: ColorPallete.grey,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+                style: TextStyle(
+                  color: ColorPallete.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.none,
+                  decorationThickness: 0,
+                ),
+                cursorColor: ColorPallete.red,
+                autofocus: true,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                  hintText: 'Description Title',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: ColorPallete.grey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+                style: TextStyle(
+                  color: ColorPallete.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.none,
+                  decorationThickness: 0,
+                ),
+                cursorColor: ColorPallete.red,
+              ),
+              const Divider(thickness: 0.1, color: ColorPallete.grey),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Icon(Icons.inbox, color: ColorPallete.white),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.arrow_circle_right,
+                        color: ColorPallete.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
