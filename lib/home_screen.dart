@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todolist_app/widgets/tile_widget.dart';
 import 'constants.dart';
+import 'data/todo.dart';
 
 class TodoHomeScreen extends StatefulWidget {
   const TodoHomeScreen({super.key});
@@ -10,7 +11,20 @@ class TodoHomeScreen extends StatefulWidget {
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
+  List<Todo> _todos = [];
   int _selectedIndex = 0;
+
+  String? _title;
+  String? _description;
+
+  @override
+  void initState() {
+    super.initState();
+    _todos = [
+      Todo(title: "Task 1", description: "Belajar Dart"),
+      Todo(title: "Task 2", description: "Belajar Flutter"),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +71,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    TodoTileWidget(todo: DummyData.taskList[index]),
+                    TodoTileWidget(todo: _todos[index]),
                     const SizedBox(height: 16),
                     const Divider(
                       thickness: 0.1,
@@ -67,7 +81,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                   ],
                 );
               },
-              itemCount: DummyData.taskList.length,
+              itemCount: _todos.length,
             ),
           ),
         ],
@@ -120,6 +134,16 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     });
   }
 
+  void _addTodo() {
+    if (_title != null && _description != null) {
+      var todo = Todo(title: _title!, description: _description!);
+
+      setState(() {
+        _todos.add(todo);
+      });
+    }
+  }
+
   void _showAddTaskModalBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -138,6 +162,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                onChanged: (value) {
+                  _title = value;
+                },
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
                   hintText: 'Task Title',
@@ -160,6 +187,9 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                 autofocus: true,
               ),
               TextField(
+                onChanged: (value) {
+                  _description = value;
+                },
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
                   hintText: 'Description Title',
@@ -189,6 +219,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                     const Icon(Icons.inbox, color: ColorPallete.white),
                     IconButton(
                       onPressed: () {
+                        _addTodo();
                         Navigator.pop(context);
                       },
                       icon: const Icon(
