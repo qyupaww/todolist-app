@@ -4,7 +4,12 @@ import '../data/todo.dart';
 
 class TodoTileWidget extends StatefulWidget {
   final Todo todo;
-  const TodoTileWidget({required this.todo, super.key});
+  final Function(String id) checkedTodo;
+  const TodoTileWidget({
+    required this.todo,
+    required this.checkedTodo,
+    super.key,
+  });
 
   @override
   State<TodoTileWidget> createState() => _TodoTileWidgetState();
@@ -25,12 +30,18 @@ class _TodoTileWidgetState extends State<TodoTileWidget> {
           child: Transform.scale(
             scale: 1.2,
             child: Checkbox(
+              activeColor: ColorPallete.red,
               value: _isChecked,
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value != null) {
                   setState(() {
                     _isChecked = value;
                   });
+
+                  if (value == true) {
+                    await Future.delayed(const Duration(milliseconds: 800));
+                    widget.checkedTodo(widget.todo.id);
+                  }
                 }
               },
               shape: const CircleBorder(),

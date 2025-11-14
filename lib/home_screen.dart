@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todolist_app/services/shared_preferences.dart';
 import 'package:todolist_app/widgets/tile_widget.dart';
 import 'constants.dart';
 import 'data/todo.dart';
@@ -11,6 +12,8 @@ class TodoHomeScreen extends StatefulWidget {
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
+  late TodoSharedPreferences _todoSharedPreferences;
+
   List<Todo> _todos = [];
   int _selectedIndex = 0;
 
@@ -20,10 +23,28 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _todos = [
-      Todo(title: "Task 1", description: "Belajar Dart"),
-      Todo(title: "Task 2", description: "Belajar Flutter"),
-    ];
+    _todoSharedPreferences = TodoSharedPreferences();
+
+    _initTodos();
+  }
+
+  void _initTodos() async {
+    var todos = await _todoSharedPreferences.getAllTodos();
+
+    if (todos.isEmpty) {
+      await _todoSharedPreferences.saveTodo(
+        Todo(title: "Task 1", description: "Belajar Dart"),
+      );
+      await _todoSharedPreferences.saveTodo(
+        Todo(title: "Task 2", description: "Belajar Flutter"),
+      );
+
+      todos = await _todoSharedPreferences.getAllTodos();
+    }
+
+    setState(() {
+      _todos = todos;
+    });
   }
 
   @override
@@ -71,7 +92,11 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
               itemBuilder: (context, index) {
                 return Column(
                   children: [
-                    TodoTileWidget(todo: _todos[index]),
+                    TodoTileWidget(
+                      key: ValueKey(_todos[index].id),
+                      todo: _todos[index],
+                      checkedTodo: _checkedTodo,
+                    ),
                     const SizedBox(height: 16),
                     const Divider(
                       thickness: 0.1,
@@ -138,10 +163,20 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     if (_title != null && _description != null) {
       var todo = Todo(title: _title!, description: _description!);
 
+      _todoSharedPreferences.saveTodo(todo);
+
       setState(() {
         _todos.add(todo);
       });
     }
+  }
+
+  Future<void> _checkedTodo(String id) async {
+    await _todoSharedPreferences.deleteTodoById(id);
+
+    setState(() {
+      _todos.removeWhere((todo) => todo.id == id);
+    });
   }
 
   void _showAddTaskModalBottomSheet(BuildContext context) {
