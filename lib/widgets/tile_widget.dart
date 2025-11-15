@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todolist_app/extension.dart';
 import '../constants.dart';
 import '../data/todo.dart';
+import '../services/model.dart';
 
 class TodoTileWidget extends StatefulWidget {
   final Todo todo;
-  final Function(String id) checkedTodo;
-  const TodoTileWidget({
-    required this.todo,
-    required this.checkedTodo,
-    super.key,
-  });
+  const TodoTileWidget({required this.todo, super.key});
 
   @override
   State<TodoTileWidget> createState() => _TodoTileWidgetState();
@@ -17,6 +15,13 @@ class TodoTileWidget extends StatefulWidget {
 
 class _TodoTileWidgetState extends State<TodoTileWidget> {
   bool _isChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _isChecked = widget.todo.isChecked;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +45,11 @@ class _TodoTileWidgetState extends State<TodoTileWidget> {
 
                   if (value == true) {
                     await Future.delayed(const Duration(milliseconds: 800));
-                    widget.checkedTodo(widget.todo.id);
+                    if (mounted)
+                      Provider.of<TodoModel>(
+                        context,
+                        listen: false,
+                      ).checkedTodo(widget.todo.id);
                   }
                 }
               },
@@ -50,28 +59,33 @@ class _TodoTileWidgetState extends State<TodoTileWidget> {
           ),
         ),
         const SizedBox(width: 12),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.todo.title,
-              style: TextStyle(
-                color: ColorPallete.white,
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
+        GestureDetector(
+          onTap: () {
+            context.showAddTaskModalDialog(todo: widget.todo);
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.todo.title,
+                style: TextStyle(
+                  color: ColorPallete.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              widget.todo.description,
-              style: TextStyle(
-                color: ColorPallete.grey,
-                fontSize: 12,
-                fontWeight: FontWeight.normal,
+              const SizedBox(height: 4),
+              Text(
+                widget.todo.description,
+                style: TextStyle(
+                  color: ColorPallete.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

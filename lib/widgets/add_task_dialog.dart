@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../constants.dart';
+import '../data/todo.dart';
+import '../services/model.dart';
+
+class TodoAddTaskDialog extends StatefulWidget {
+  final BuildContext mainContext;
+  final Todo? todo;
+  const TodoAddTaskDialog({required this.mainContext, this.todo, super.key});
+
+  @override
+  State<TodoAddTaskDialog> createState() => _TodoAddTaskDialogState();
+}
+
+class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
+  String? _title;
+  String? _description;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.todo != null) {
+      _title = widget.todo!.title;
+      _description = widget.todo!.description;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            onChanged: (value) {
+              _title = value;
+            },
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16),
+              hintText: 'Task Title',
+              border: InputBorder.none,
+              hintStyle: TextStyle(
+                color: ColorPallete.grey,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.none,
+              ),
+            ),
+            style: TextStyle(
+              color: ColorPallete.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.none,
+              decorationThickness: 0,
+            ),
+            cursorColor: ColorPallete.red,
+            autofocus: true,
+          ),
+          TextField(
+            onChanged: (value) {
+              _description = value;
+            },
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16),
+              hintText: 'Description Title',
+              border: InputBorder.none,
+              hintStyle: TextStyle(
+                color: ColorPallete.grey,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.none,
+              ),
+            ),
+            style: TextStyle(
+              color: ColorPallete.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.none,
+              decorationThickness: 0,
+            ),
+            cursorColor: ColorPallete.red,
+          ),
+          const Divider(thickness: 0.1, color: ColorPallete.grey),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Icon(Icons.inbox, color: ColorPallete.white),
+                IconButton(
+                  onPressed: () {
+                    if (_title != null && _description != null) {
+                      Provider.of<TodoModel>(
+                        widget.mainContext,
+                        listen: false,
+                      ).saveTodo(
+                        id: widget.todo?.id,
+                        title: _title!,
+                        description: _description!,
+                      );
+                    }
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_circle_right,
+                    color: ColorPallete.red,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

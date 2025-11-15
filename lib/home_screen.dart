@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:todolist_app/services/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'extension.dart';
 import 'package:todolist_app/widgets/tile_widget.dart';
 import 'constants.dart';
-import 'data/todo.dart';
+import 'services/model.dart';
 
 class TodoHomeScreen extends StatefulWidget {
   const TodoHomeScreen({super.key});
@@ -12,40 +13,7 @@ class TodoHomeScreen extends StatefulWidget {
 }
 
 class _TodoHomeScreenState extends State<TodoHomeScreen> {
-  late TodoSharedPreferences _todoSharedPreferences;
-
-  List<Todo> _todos = [];
   int _selectedIndex = 0;
-
-  String? _title;
-  String? _description;
-
-  @override
-  void initState() {
-    super.initState();
-    _todoSharedPreferences = TodoSharedPreferences();
-
-    _initTodos();
-  }
-
-  void _initTodos() async {
-    var todos = await _todoSharedPreferences.getAllTodos();
-
-    if (todos.isEmpty) {
-      await _todoSharedPreferences.saveTodo(
-        Todo(title: "Task 1", description: "Belajar Dart"),
-      );
-      await _todoSharedPreferences.saveTodo(
-        Todo(title: "Task 2", description: "Belajar Flutter"),
-      );
-
-      todos = await _todoSharedPreferences.getAllTodos();
-    }
-
-    setState(() {
-      _todos = todos;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,26 +55,30 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
           const Divider(thickness: 0.1, color: ColorPallete.grey),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    TodoTileWidget(
-                      key: ValueKey(_todos[index].id),
-                      todo: _todos[index],
-                      checkedTodo: _checkedTodo,
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(
-                      thickness: 0.1,
-                      color: ColorPallete.grey,
-                      indent: 40,
-                    ),
-                  ],
+            child: Consumer<TodoModel>(
+              builder: (context, model, child) {
+                final _todos = model.todos;
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        TodoTileWidget(
+                          key: ValueKey(_todos[index].id),
+                          todo: _todos[index],
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(
+                          thickness: 0.1,
+                          color: ColorPallete.grey,
+                          indent: 40,
+                        ),
+                      ],
+                    );
+                  },
+                  itemCount: _todos.length,
                 );
               },
-              itemCount: _todos.length,
             ),
           ),
         ],
@@ -114,7 +86,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: ColorPallete.red,
         onPressed: () {
-          _showAddTaskModalBottomSheet(context);
+          context.showAddTaskModalDialog();
         },
         tooltip: 'Add Task',
         shape: const CircleBorder(),
@@ -157,118 +129,5 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-  }
-
-  void _addTodo() {
-    if (_title != null && _description != null) {
-      var todo = Todo(title: _title!, description: _description!);
-
-      _todoSharedPreferences.saveTodo(todo);
-
-      setState(() {
-        _todos.add(todo);
-      });
-    }
-  }
-
-  Future<void> _checkedTodo(String id) async {
-    await _todoSharedPreferences.deleteTodoById(id);
-
-    setState(() {
-      _todos.removeWhere((todo) => todo.id == id);
-    });
-  }
-
-  void _showAddTaskModalBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ColorPallete.black,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-      ),
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            top: 8,
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                onChanged: (value) {
-                  _title = value;
-                },
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                  hintText: 'Task Title',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(
-                    color: ColorPallete.grey,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-                style: TextStyle(
-                  color: ColorPallete.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.none,
-                  decorationThickness: 0,
-                ),
-                cursorColor: ColorPallete.red,
-                autofocus: true,
-              ),
-              TextField(
-                onChanged: (value) {
-                  _description = value;
-                },
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                  hintText: 'Description Title',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(
-                    color: ColorPallete.grey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-                style: TextStyle(
-                  color: ColorPallete.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.none,
-                  decorationThickness: 0,
-                ),
-                cursorColor: ColorPallete.red,
-              ),
-              const Divider(thickness: 0.1, color: ColorPallete.grey),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Icon(Icons.inbox, color: ColorPallete.white),
-                    IconButton(
-                      onPressed: () {
-                        _addTodo();
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.arrow_circle_right,
-                        color: ColorPallete.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 }
