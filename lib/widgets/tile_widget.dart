@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todolist_app/extension.dart';
+import 'package:todolist_app/services/bloc/bloc.dart';
 import '../constants.dart';
 import '../data/todo.dart';
-import '../services/model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TodoTileWidget extends StatefulWidget {
   final Todo todo;
@@ -42,14 +43,13 @@ class _TodoTileWidgetState extends State<TodoTileWidget> {
                   setState(() {
                     _isChecked = value;
                   });
-
                   if (value == true) {
                     await Future.delayed(const Duration(milliseconds: 800));
+
                     if (mounted)
-                      Provider.of<TodoModel>(
-                        context,
-                        listen: false,
-                      ).checkedTodo(widget.todo.id);
+                      context.read<TodoBloc>().add(
+                        TodoRemoveTaskEvent(widget.todo.id),
+                      );
                   }
                 }
               },

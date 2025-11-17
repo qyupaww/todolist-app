@@ -26,5 +26,5 @@ class TodoEditTaskEvent extends TodoEvent {
 class TodoRemoveTaskEvent extends TodoEvent {
   final String id;
 
-  TodoRemoveTaskEvent({required this.id});
+  TodoRemoveTaskEvent(this.id);
 }

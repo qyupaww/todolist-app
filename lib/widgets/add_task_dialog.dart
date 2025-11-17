@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../constants.dart';
 import '../data/todo.dart';
-import '../services/model.dart';
+import '../services/bloc/bloc.dart';
 
 class TodoAddTaskDialog extends StatefulWidget {
   final BuildContext mainContext;
@@ -39,6 +39,7 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            controller: TextEditingController()..text = _title ?? "",
             onChanged: (value) {
               _title = value;
             },
@@ -64,6 +65,7 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
             autofocus: true,
           ),
           TextField(
+            controller: TextEditingController()..text = _title ?? "",
             onChanged: (value) {
               _description = value;
             },
@@ -97,14 +99,22 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
                 IconButton(
                   onPressed: () {
                     if (_title != null && _description != null) {
-                      Provider.of<TodoModel>(
-                        widget.mainContext,
-                        listen: false,
-                      ).saveTodo(
-                        id: widget.todo?.id,
-                        title: _title!,
-                        description: _description!,
-                      );
+                      if (_isEditTask) {
+                        widget.mainContext.read<TodoBloc>().add(
+                          TodoEditTaskEvent(
+                            id: widget.todo!.id,
+                            title: _title!,
+                            description: _description!,
+                          ),
+                        );
+                      } else {
+                        widget.mainContext.read<TodoBloc>().add(
+                          TodoAddTaskEvent(
+                            title: _title!,
+                            description: _description!,
+                          ),
+                        );
+                      }
                     }
                     Navigator.pop(context);
                   },
@@ -120,4 +130,6 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
       ),
     );
   }
+
+  bool get _isEditTask => widget.todo != null;
 }
