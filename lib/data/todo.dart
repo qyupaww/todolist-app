@@ -44,4 +44,6 @@ class Todo {
       'isChecked': isChecked,
     };
   }
+
+  copyWith({required String title, required String description}) {}
 }
