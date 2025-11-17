@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'extension.dart';
 import 'package:todolist_app/widgets/tile_widget.dart';
 import 'constants.dart';
-import 'services/model.dart';
+import 'services/bloc/bloc.dart';
 
 class TodoHomeScreen extends StatefulWidget {
   const TodoHomeScreen({super.key});
@@ -55,17 +55,17 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
           ),
           const Divider(thickness: 0.1, color: ColorPallete.grey),
           Expanded(
-            child: Consumer<TodoModel>(
-              builder: (context, model, child) {
-                final _todos = model.todos;
+            child: BlocBuilder<TodoBloc, TodoState>(
+              builder: (context, state) {
+                final todos = state.todos;
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemBuilder: (context, index) {
                     return Column(
                       children: [
                         TodoTileWidget(
-                          key: ValueKey(_todos[index].id),
-                          todo: _todos[index],
+                          key: ValueKey(todos[index].id),
+                          todo: todos[index],
                         ),
                         const SizedBox(height: 16),
                         const Divider(
@@ -76,7 +76,7 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
                       ],
                     );
                   },
-                  itemCount: _todos.length,
+                  itemCount: todos.length,
                 );
               },
             ),
