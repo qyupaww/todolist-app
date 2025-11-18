@@ -4,6 +4,7 @@ import 'extension.dart';
 import 'package:todolist_app/widgets/tile_widget.dart';
 import 'constants.dart';
 import 'services/bloc/bloc.dart';
+import 'widgets/empty_widget.dart';
 
 class TodoHomeScreen extends StatefulWidget {
   const TodoHomeScreen({super.key});
@@ -58,26 +59,32 @@ class _TodoHomeScreenState extends State<TodoHomeScreen> {
             child: BlocBuilder<TodoBloc, TodoState>(
               builder: (context, state) {
                 final todos = state.todos;
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        TodoTileWidget(
-                          key: ValueKey(todos[index].id),
-                          todo: todos[index],
-                        ),
-                        const SizedBox(height: 16),
-                        const Divider(
-                          thickness: 0.1,
-                          color: ColorPallete.grey,
-                          indent: 40,
-                        ),
-                      ],
-                    );
-                  },
-                  itemCount: todos.length,
-                );
+                if (state.status == TodoStatus.empty) {
+                  return const TodoEmptyWidget();
+                } else if (state.status == TodoStatus.loaded) {
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          TodoTileWidget(
+                            key: ValueKey(todos[index].id),
+                            todo: todos[index],
+                          ),
+                          const SizedBox(height: 16),
+                          const Divider(
+                            thickness: 0.1,
+                            color: ColorPallete.grey,
+                            indent: 40,
+                          ),
+                        ],
+                      );
+                    },
+                    itemCount: todos.length,
+                  );
+                } else {
+                  return const SizedBox();
+                }
               },
             ),
           ),
