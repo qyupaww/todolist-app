@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../constants.dart';
 import '../data/todo.dart';
@@ -32,7 +32,7 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        top: 8,
+        top: 8.0,
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Column(
@@ -43,20 +43,20 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
             onChanged: (value) {
               _title = value;
             },
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-              hintText: 'Task Title',
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+              hintText: 'Task Name',
               border: InputBorder.none,
               hintStyle: TextStyle(
                 color: ColorPallete.grey,
-                fontSize: 18,
+                fontSize: 18.0,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.none,
               ),
             ),
-            style: TextStyle(
+            style: const TextStyle(
               color: ColorPallete.white,
-              fontSize: 18,
+              fontSize: 18.0,
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.none,
               decorationThickness: 0,
@@ -65,24 +65,24 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
             autofocus: true,
           ),
           TextField(
-            controller: TextEditingController()..text = _title ?? "",
+            controller: TextEditingController()..text = _description ?? "",
             onChanged: (value) {
               _description = value;
             },
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-              hintText: 'Description Title',
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+              hintText: 'Description',
               border: InputBorder.none,
               hintStyle: TextStyle(
                 color: ColorPallete.grey,
-                fontSize: 14,
+                fontSize: 14.0,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.none,
               ),
             ),
-            style: TextStyle(
+            style: const TextStyle(
               color: ColorPallete.white,
-              fontSize: 14,
+              fontSize: 14.0,
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.none,
               decorationThickness: 0,
@@ -91,7 +91,7 @@ class _TodoAddTaskDialogState extends State<TodoAddTaskDialog> {
           ),
           const Divider(thickness: 0.1, color: ColorPallete.grey),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

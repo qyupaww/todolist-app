@@ -19,12 +19,16 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   void _onInitTodo(TodoInitEvent event, Emitter<TodoState> emit) async {
     final todos = await todoSharedPreferences.getAllTodos();
 
-    emit(
-      TodoState(
-        status: TodoStatus.loaded,
-        todos: List.of(state.todos)..addAll(todos),
-      ),
-    );
+    if (todos.isNotEmpty) {
+      emit(
+        TodoState(
+          status: TodoStatus.loaded,
+          todos: List.of(state.todos)..addAll(todos),
+        ),
+      );
+    } else {
+      emit(const TodoState(status: TodoStatus.empty));
+    }
   }
 
   void _onAddTask(TodoAddTaskEvent event, Emitter<TodoState> emit) async {
@@ -63,8 +67,12 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
     state.todos.removeWhere((todo) => todo.id == event.id);
 
-    emit(
-      state.copyWith(status: TodoStatus.loaded, todos: List.of(state.todos)),
-    );
+    if (state.todos.isNotEmpty) {
+      emit(
+        state.copyWith(status: TodoStatus.loaded, todos: List.of(state.todos)),
+      );
+    } else {
+      emit(const TodoState(status: TodoStatus.empty));
+    }
   }
 }

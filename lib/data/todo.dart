@@ -45,5 +45,17 @@ class Todo {
     };
   }
 
-  copyWith({required String title, required String description}) {}
+  Todo copyWith({
+    String? id,
+    String? title,
+    String? description,
+    bool? isChecked,
+  }) {
+    return Todo(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      isChecked: isChecked ?? this.isChecked,
+    );
+  }
 }
